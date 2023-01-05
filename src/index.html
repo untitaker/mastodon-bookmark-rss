@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+
+<h1>Mastodon Bookmarks RSS</h1>
+
+<p>An app to subscribe to your bookmarks as RSS feed.</p>
+
+<ol>
+    <li>Go to <code>yourinstance.social/settings/applications</code></li>
+    <li>Create a new application with permission to read bookmarks.</li>
+    <li>Paste the <i>Access Token</i> back into this form:
+
+        <form action=/feed method=get>
+            <p><label for=host><input type=text name=host pattern="[a-zA-Z0-9.]+" /> Your instance, e.g. <code>yourinstance.social</code></label></p>
+            <p><label for=token><input type=text name=token /> The token you copied</label></p>
+
+            <input type=submit value="Go to RSS feed for your bookmarks" />
+        </form>
+    </li>
+</ol>
+
+<p>With some love by Markus Unterwaditzer, <a href="https://github.com/untitaker/mastodon-bookmark-rss">source code on GitHub</a></p>

@@ -2,7 +2,7 @@ use axum::{
     error_handling::HandleErrorLayer,
     extract::Query,
     http::StatusCode,
-    response::{IntoResponse, Response},
+    response::{IntoResponse, Response, Html},
     routing::get,
     BoxError, Router,
 };
@@ -52,8 +52,8 @@ async fn main() {
 }
 
 // basic handler that responds with a static string
-async fn root() -> &'static str {
-    "Hello, World!"
+async fn root() -> Html<&'static str> {
+    Html(include_str!("index.html"))
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -140,7 +140,8 @@ async fn show_feed(Query(params): Query<ShowFeed>) -> Result<Response, Error> {
 
     Ok((
         StatusCode::OK,
-        [("Content-Type", "application/rss+xml")],
+        // Use this nonstandard content type so that Firefox does not download the feed.
+        [("Content-Type", "text/xml")],
         body,
     )
         .into_response())
