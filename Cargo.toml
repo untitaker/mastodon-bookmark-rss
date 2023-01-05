@@ -2,6 +2,9 @@
 name = "mastodon-bookmark-rss"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+homepage = "https://github.com/untitaker/mastodon-bookmark-rss"
+repository = "https://github.com/untitaker/mastodon-bookmark-rss"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
