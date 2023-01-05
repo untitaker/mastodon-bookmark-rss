@@ -2,7 +2,7 @@ use axum::{
     error_handling::HandleErrorLayer,
     extract::Query,
     http::StatusCode,
-    response::{IntoResponse, Response, Html},
+    response::{Html, IntoResponse, Response},
     routing::get,
     BoxError, Router,
 };
@@ -66,7 +66,7 @@ enum Error {
 
 impl IntoResponse for Error {
     fn into_response(self) -> Response {
-        panic!("{}", self);
+        (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()).into_response()
     }
 }
 
