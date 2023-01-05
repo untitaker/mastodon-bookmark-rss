@@ -1,6 +1,6 @@
-FROM rust:1.63-alpine3.16 as builder
+FROM rust:1.66-alpine3.16 as builder
 
-RUN apk add --no-cache musl-dev pkgconfig openssl-dev
+RUN apk add --no-cache libc-dev
 
 RUN USER=root cargo new --bin /app
 WORKDIR /app
