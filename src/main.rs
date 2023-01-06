@@ -106,7 +106,7 @@ async fn show_feed(Query(params): Query<ShowFeed>) -> Result<Response, Error> {
 
     for bookmark in upstream_response {
         body.push_str("<item>");
-        body.push_str("<link><!CDATA[");
+        body.push_str("<link><![CDATA[");
         body.push_str(&bookmark.url);
         body.push_str("]]></link>");
         body.push_str("<pubDate>");
