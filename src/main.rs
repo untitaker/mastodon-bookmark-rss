@@ -106,32 +106,32 @@ async fn show_feed(Query(params): Query<ShowFeed>) -> Result<Response, Error> {
 
     for bookmark in upstream_response {
         body.push_str("<item>");
-        body.push_str("<link>");
+        body.push_str("<link><!CDATA[");
         body.push_str(&bookmark.url);
-        body.push_str("</link>");
+        body.push_str("]]></link>");
         body.push_str("<pubDate>");
         let parsed = DateTime::parse_from_rfc3339(&bookmark.created_at)?;
         body.push_str(&parsed.to_rfc2822());
         body.push_str("</pubDate>");
-        body.push_str("<guid>");
+        body.push_str("<guid><![CDATA[");
         body.push_str(&bookmark.url);
-        body.push_str("</guid>");
+        body.push_str("]]></guid>");
         if let Some(ref card) = bookmark.card {
-            body.push_str("<title>");
+            body.push_str("<title><![CDATA[");
             body.push_str(&card.title);
-            body.push_str("</title>");
+            body.push_str("]]></title>");
 
             body.push_str("<description><![CDATA[");
-            body.push_str(&card.description);
+            body.push_str(&escape_for_cdata(&card.description));
             body.push_str("]]></description>");
         } else {
-            body.push_str("<title>");
+            body.push_str("<title><![CDATA[");
             body.push_str(&bookmark.url);
-            body.push_str("</title>");
+            body.push_str("]]></title>");
         }
 
         body.push_str("<content:encoded><![CDATA[");
-        body.push_str(&bookmark.content);
+        body.push_str(&escape_for_cdata(&bookmark.content));
         body.push_str("]]></content:encoded>");
         body.push_str("</item>\n");
     }
@@ -145,6 +145,14 @@ async fn show_feed(Query(params): Query<ShowFeed>) -> Result<Response, Error> {
         body,
     )
         .into_response())
+}
+
+fn escape_for_cdata(input: &str) -> String {
+    // There do not appear to be any decent standalone crates for this.
+    input
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace("]]>", "")
 }
 
 #[derive(Deserialize)]
