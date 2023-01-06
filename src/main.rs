@@ -151,7 +151,6 @@ fn escape_for_cdata(input: &str) -> String {
     // There do not appear to be any decent standalone crates for this.
     input
         .replace("&", "&amp;")
-        .replace("<", "&lt;")
         .replace("]]>", "")
 }
 
