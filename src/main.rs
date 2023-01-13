@@ -141,7 +141,7 @@ async fn show_feed(Query(params): Query<ShowFeed>) -> Result<Response, Error> {
     Ok((
         StatusCode::OK,
         // Use this nonstandard content type so that Firefox does not download the feed.
-        [("Content-Type", "text/xml")],
+        [("Content-Type", "text/xml; charset=\"utf-8\"")],
         body,
     )
         .into_response())
