@@ -89,20 +89,22 @@ async fn show_feed(Query(params): Query<ShowFeed>) -> Result<Response, Error> {
     // Why can't I use a generator here? Oh god.
     let mut body = String::new();
     body.push_str(
-        r#"<?xml
-        version="1.0" encoding="UTF-8"?><rss version="2.0"
-        xmlns:content="http://purl.org/rss/1.0/modules/content/"
-        xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-        xmlns:dc="http://purl.org/dc/elements/1.1/"
-        xmlns:atom="http://www.w3.org/2005/Atom"
-        xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
-        xmlns:slash="http://purl.org/rss/1.0/modules/slash/">
+        r#"<?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0"
+            xmlns:content="http://purl.org/rss/1.0/modules/content/"
+            xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+            xmlns:dc="http://purl.org/dc/elements/1.1/"
+            xmlns:atom="http://www.w3.org/2005/Atom"
+            xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+            xmlns:slash="http://purl.org/rss/1.0/modules/slash/">
         <channel>
         <title>Mastodon Bookmarks</title>
         <description></description>
-        <link></link>
-        "#,
+        <link><![CDATA[https://"#,
     );
+
+    body.push_str(&params.host);
+    body.push_str("]]></link>");
 
     for bookmark in upstream_response {
         body.push_str("<item>");
