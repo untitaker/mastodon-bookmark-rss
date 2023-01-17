@@ -1,3 +1,11 @@
+FROM node:19-alpine3.16 as frontend-builder
+
+WORKDIR /app
+COPY yarn.lock package.json ./
+COPY src/app.css ./src/
+RUN yarn install --pure-lockfile
+RUN yarn build
+
 FROM rust:1.66-alpine3.16 as builder
 
 RUN apk add --no-cache libc-dev
@@ -20,6 +28,7 @@ RUN strip target/release/mastodon-bookmark-rss
 # This should only compile the app itself as the
 # dependencies were already built above.
 COPY . ./
+COPY --from=frontend-builder /app/src/bundle.css /app/src/bundle.css
 RUN rm ./target/release/deps/mastodon_bookmark_rss* && cargo build --release
 
 # Our production image starts here, which uses

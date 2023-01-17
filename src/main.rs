@@ -1,6 +1,6 @@
 use axum::{
     error_handling::HandleErrorLayer,
-    extract::Query,
+    extract::{Query, Host},
     http::StatusCode,
     response::{Html, IntoResponse, Response},
     routing::get,
@@ -31,7 +31,9 @@ async fn main() {
     );
 
     let app = Router::new()
-        .route("/", get(root))
+        .route("/", get(|| async { Html(include_str!("index.html")) }))
+        // If this line is failing compilation, you need to run 'yarn install && yarn build' to get your CSS bundle.
+        .route("/bundle.css", get(|| async { ([("Content-Type", "text/css")], include_str!("bundle.css")) }))
         .route("/feed", get(show_feed))
         .layer(
             ServiceBuilder::new()
@@ -51,11 +53,6 @@ async fn main() {
         .unwrap();
 }
 
-// basic handler that responds with a static string
-async fn root() -> Html<&'static str> {
-    Html(include_str!("index.html"))
-}
-
 #[derive(Debug, thiserror::Error)]
 enum Error {
     #[error("request to your mastodon instance failed: {0}")]
@@ -70,7 +67,7 @@ impl IntoResponse for Error {
     }
 }
 
-async fn show_feed(Query(params): Query<ShowFeed>) -> Result<Response, Error> {
+async fn show_feed(Query(params): Query<ShowFeed>, Host(host): Host) -> Result<Response, Error> {
     let url = format!("https://{}/api/v1/bookmarks", params.host);
 
     static HTTP_CLIENT: OnceCell<reqwest::Client> = OnceCell::new();
@@ -78,6 +75,10 @@ async fn show_feed(Query(params): Query<ShowFeed>) -> Result<Response, Error> {
         .get_or_init(reqwest::Client::new)
         .get(url)
         .header("Authorization", format!("Bearer {}", params.token))
+
+        // axum::extract::Host can be forged, but it is the best thing that works out of the box
+        // without extra work, and forgery is not really part of any threat model for us anyway.
+        .header("User-Agent", format!("mastodon-bookmark-rss/{} (+https://{})", env!("CARGO_PKG_VERSION"), host))
         .timeout(Duration::from_secs(5))
         .send()
         .await?

@@ -1,0 +1,16 @@
+{
+  "name": "mastodon-bookmark-rss",
+  "version": "0.1.0",
+  "description": "An app to subscribe to your Mastodon bookmarks via RSS",
+  "main": "index.tsx",
+  "repository": "git@github.com:untitaker/mastodon-bookmark-rss.git",
+  "author": "Markus Unterwaditzer <markus-honeypot@unterwaditzer.net>",
+  "license": "MIT",
+  "dependencies": {
+    "esbuild": "^0.17.2",
+    "purecss": "^3.0.0"
+  },
+  "scripts": {
+    "build": "esbuild --bundle src/app.css --outfile=src/bundle.css"
+  }
+}

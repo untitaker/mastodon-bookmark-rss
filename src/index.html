@@ -1,37 +1,73 @@
 <!DOCTYPE html>
+<html>
 
-<header>
+<head>
+    <link rel=stylesheet href=/bundle.css />
+</head>
 
-<h1>Mastodon Bookmarks RSS</h1>
+<body>
+    <header class=content>
+        <h1>Mastodon Bookmark RSS</h1>
+        <p>Subscribe to your <a href=https://joinmastodon.org>Mastodon</a> bookmarks as RSS feed</p>
+    </header>
 
-<p>An app to subscribe to your bookmarks as RSS feed.</p>
+    <ol class=content>
+        <li>Go to <code>yourinstance.example/settings/applications</code></li>
+        <li>Create a new application with permission to read bookmarks</li>
+        <li>Paste the <i>Access Token</i> back into this form:
 
-</header>
+            <form class="pure-form pure-form-aligned" action=/feed method=get>
+                <fieldset>
+                    <div class=pure-control-group>
+                    <label for=host>Your instance</label>
+                    <input type=text id=host name=host placeholder=yourinstance.example pattern="[a-zA-Z0-9.]+" />
+                    </div>
 
-<ol>
-    <li>Go to <code>yourinstance.social/settings/applications</code></li>
-    <li>Create a new application with permission to read bookmarks.</li>
-    <li>Paste the <i>Access Token</i> back into this form:
+                    <div class=pure-control-group>
+                    <label for=token>The token you copied</label>
+                    <input type=text id=token name=token />
+                    </div>
 
-        <form action=/feed method=get>
-            <p><label for=host><input type=text id=host name=host pattern="[a-zA-Z0-9.]+" /> Your instance, e.g. <code>yourinstance.social</code></label></p>
-            <p><label for=token><input type=text id=token name=token /> The token you copied</label></p>
+                    <div class=pure-controls>
+                    <input type=submit class="pure-button pure-button-primary" value="Get RSS feed" />
+                    </div>
+                </fieldset>
+            </form>
+        </li>
+    </ol>
 
-            <input type=submit value="Go to RSS feed for your bookmarks" />
-        </form>
-    </li>
-</ol>
+    <section class=content>
+        <h2 class="content-head is-center">About this service</h2>
 
-<h2>Privacy</h2>
+        <ul>
+            <li>
+                This service does not store any data at all. The access token you
+                provide is just encoded in the RSS feed's URL and temporarily stored in
+                server memory every time the RSS feed is requested by your feed reader.
+            </li>
 
-This service does not store any credentials, not even in access logs. The
-access token you provide is just encoded in the RSS feed's URL and temporarily
-stored in memory every time the RSS feed is created.
+            <li>
+                This service acts on a user's behalf. It requires explicit setup by a
+                user, like for example a mobile client. Therefore, like a mobile
+                client, this service does <strong>not</strong> respect
+                <code>robots.txt</code>.
+            </li>
 
-</hr>
+            <li>
+                This service is open-source, and the code can be found on
+                <a href="https://github.com/untitaker/mastodon-bookmark-rss">GitHub</a>.
+                Anybody can run it.  Therefore, anybody can modify their
+                installation of it to do things that are not documented here.
+            </li>
 
-<footer>
+            <li>
+                The corresponding user-agent for this service is of the form
+                <code>mastodon-bookmark-rss/&lt;version&gt; (+&lt;installation_url&gt;)</code>.
+                <code>installation_url</code> will point to the public URL of wherever
+                this software is hosted, on a best-effort basis.
+            </li>
 
-<p>With some love by Markus Unterwaditzer, <a href="https://github.com/untitaker/mastodon-bookmark-rss">source code on GitHub</a></p>
-
-</footer>
+        </ul>
+    </section>
+</body>
+</html>

@@ -1,0 +1,6 @@
+@import "../node_modules/purecss/build/pure-min.css";
+
+.content {
+    max-width: 500px;
+    margin: 0 auto;
+}
