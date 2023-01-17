@@ -1,6 +1,6 @@
 use axum::{
     error_handling::HandleErrorLayer,
-    extract::{Query, Host},
+    extract::{Host, Query},
     http::StatusCode,
     response::{Html, IntoResponse, Response},
     routing::get,
@@ -33,7 +33,10 @@ async fn main() {
     let app = Router::new()
         .route("/", get(|| async { Html(include_str!("index.html")) }))
         // If this line is failing compilation, you need to run 'yarn install && yarn build' to get your CSS bundle.
-        .route("/bundle.css", get(|| async { ([("Content-Type", "text/css")], include_str!("bundle.css")) }))
+        .route(
+            "/bundle.css",
+            get(|| async { ([("Content-Type", "text/css")], include_str!("bundle.css")) }),
+        )
         .route("/feed", get(show_feed))
         .layer(
             ServiceBuilder::new()
@@ -75,10 +78,16 @@ async fn show_feed(Query(params): Query<ShowFeed>, Host(host): Host) -> Result<R
         .get_or_init(reqwest::Client::new)
         .get(url)
         .header("Authorization", format!("Bearer {}", params.token))
-
         // axum::extract::Host can be forged, but it is the best thing that works out of the box
         // without extra work, and forgery is not really part of any threat model for us anyway.
-        .header("User-Agent", format!("mastodon-bookmark-rss/{} (+https://{})", env!("CARGO_PKG_VERSION"), host))
+        .header(
+            "User-Agent",
+            format!(
+                "mastodon-bookmark-rss/{} (+https://{})",
+                env!("CARGO_PKG_VERSION"),
+                host
+            ),
+        )
         .timeout(Duration::from_secs(5))
         .send()
         .await?
@@ -152,9 +161,7 @@ async fn show_feed(Query(params): Query<ShowFeed>, Host(host): Host) -> Result<R
 
 fn escape_for_cdata(input: &str) -> String {
     // There do not appear to be any decent standalone crates for this.
-    input
-        .replace("&", "&amp;")
-        .replace("]]>", "")
+    input.replace("&", "&amp;").replace("]]>", "")
 }
 
 #[derive(Deserialize)]
