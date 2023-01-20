@@ -8,9 +8,15 @@
   "license": "MIT",
   "dependencies": {
     "esbuild": "^0.17.2",
-    "purecss": "^3.0.0"
+    "purecss": "^3.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "scripts": {
-    "build": "esbuild --bundle src/app.css --outfile=src/bundle.css"
+    "build": "esbuild --bundle --minify src/app.tsx --outfile=target/bundle.js",
+    "dev": "find src/ | entr -sr 'yarn build && cargo run'"
+  },
+  "devDependencies": {
+    "@types/react-dom": "^18.0.10"
   }
 }

@@ -4,3 +4,7 @@
     max-width: 500px;
     margin: 0 auto;
 }
+
+.green {
+    color: rgb(28, 184, 65);
+}

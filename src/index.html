@@ -12,40 +12,9 @@
         <p>Subscribe to your <a href=https://joinmastodon.org>Mastodon</a> bookmarks as RSS feed</p>
     </header>
 
-    <ol class=content>
-        <li>Go to <code>yourinstance.example/settings/applications</code></li>
-        <li>Create a new application with permission to read bookmarks</li>
-        <li>Paste the <i>Access Token</i> back into this form:
-
-            <form class="pure-form pure-form-aligned" action=/feed method=get>
-                <fieldset>
-                    <div class=pure-control-group>
-                    <label for=host>Your instance</label>
-                    <input type=text id=host name=host placeholder=yourinstance.example pattern="[a-zA-Z0-9.]+" />
-                    </div>
-
-                    <div class=pure-control-group>
-                    <label for=token>The token you copied</label>
-                    <!--
-                        Ideally this would not mask the token at all, but
-                        AFAICT there's no safe way to do that without
-                        potentially confusing the browser into storing the
-                        token as part of autocomplete. autocomplete=off does not
-                        seem to provide any guarantee that the token won't be
-                        stored. not that any of this matters since we currently
-                        redirect the user to the RSS feed which makes the
-                        browser store the token in browser history
-                    -->
-                    <input type=password id=token name=token />
-                    </div>
-
-                    <div class=pure-controls>
-                    <input type=submit class="pure-button pure-button-primary" value="Get RSS feed" />
-                    </div>
-                </fieldset>
-            </form>
-        </li>
-    </ol>
+    <div id=app-root class=content>
+      This service requires JS to be enabled. Its use of JS is rather trivial, but prevents the secret feed URL from being leaked into your browser history.
+    </div>
 
     <section class=content>
         <h2 class="content-head is-center">About this service</h2>
@@ -80,5 +49,7 @@
 
         </ul>
     </section>
+
+    <script src=/bundle.js></script>
 </body>
 </html>
