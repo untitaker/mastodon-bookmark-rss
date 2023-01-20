@@ -26,7 +26,17 @@
 
                     <div class=pure-control-group>
                     <label for=token>The token you copied</label>
-                    <input type=text id=token name=token />
+                    <!--
+                        Ideally this would not mask the token at all, but
+                        AFAICT there's no safe way to do that without
+                        potentially confusing the browser into storing the
+                        token as part of autocomplete. autocomplete=off does not
+                        seem to provide any guarantee that the token won't be
+                        stored. not that any of this matters since we currently
+                        redirect the user to the RSS feed which makes the
+                        browser store the token in browser history
+                    -->
+                    <input type=password id=token name=token />
                     </div>
 
                     <div class=pure-controls>
