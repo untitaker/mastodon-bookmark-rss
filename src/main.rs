@@ -25,7 +25,7 @@ async fn main() {
     let governor_conf = Box::new(
         GovernorConfigBuilder::default()
             .per_second(if cfg!(debug_assertions) { 1000 } else { 2 })
-             .burst_size(if cfg!(debug_assertions) { 1000 } else { 5 })
+            .burst_size(if cfg!(debug_assertions) { 1000 } else { 5 })
             .finish()
             .unwrap(),
     );
@@ -35,11 +35,21 @@ async fn main() {
         // If this line is failing compilation, you need to run 'yarn install && yarn build' to get your CSS bundle.
         .route(
             "/bundle.css",
-            get(|| async { ([("Content-Type", "text/css")], include_str!("../target/bundle.css")) }),
+            get(|| async {
+                (
+                    [("Content-Type", "text/css")],
+                    include_str!("../build/bundle.css"),
+                )
+            }),
         )
         .route(
             "/bundle.js",
-            get(|| async { ([("Content-Type", "application/javascript")], include_str!("../target/bundle.js")) }),
+            get(|| async {
+                (
+                    [("Content-Type", "application/javascript")],
+                    include_str!("../build/bundle.js"),
+                )
+            }),
         )
         .route("/feed", get(show_feed))
         .layer(

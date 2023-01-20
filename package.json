@@ -13,7 +13,7 @@
     "react-dom": "^18.2.0"
   },
   "scripts": {
-    "build": "esbuild --bundle --minify src/app.tsx --outfile=target/bundle.js",
+    "build": "esbuild --bundle --minify src/app.tsx --outfile=build/bundle.js",
     "dev": "find src/ | entr -sr 'yarn build && cargo run'"
   },
   "devDependencies": {
