@@ -13,6 +13,7 @@ const launchLogin = async (baseUrl: string) => {
 
   const params = new FormData();
   params.append("client_name", OAUTH_CLIENT_NAME);
+  params.append("website", SERVICE_BASE_URL);
   params.append("scopes", OAUTH_SCOPES);
   params.append("redirect_uris", SERVICE_BASE_URL);
 
