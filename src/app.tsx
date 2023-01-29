@@ -100,8 +100,8 @@ const App = ({ feedUrlPromise }: AppProps) => {
               id="host"
               required
               name="host"
-              placeholder="yourinstance.example"
-              pattern="[a-zA-Z0-9.]+"
+              placeholder="e.g. mastodon.social"
+              pattern="[a-zA-Z0-9.:-]+"
               title="Something that looks like a hostname"
             />
           </div>
