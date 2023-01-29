@@ -11,10 +11,10 @@ const App = () => {
   const submitForm = (e: SubmitEvent) => {
     setSubmittedForm({
       host: e.target.host.value,
-      token: e.target.token.value,
+      token: e.target.token.value.trim(),
     });
     e.preventDefault();
-  }
+  };
 
   let stepFour = null;
 
@@ -40,12 +40,12 @@ const App = () => {
                 <fieldset>
                     <div className="pure-control-group">
                     <label htmlFor="host">Your instance</label>
-                    <input type="text" id="host" name="host" placeholder="yourinstance.example" pattern="[a-zA-Z0-9.]+" />
+                    <input type="text" id="host" required name="host" placeholder="yourinstance.example" pattern="[a-zA-Z0-9.]+" title="Something that looks like a hostname" />
                     </div>
 
                     <div className="pure-control-group">
                     <label htmlFor="token">The token you copied</label>
-                    <input type="password" id="token" name="token" />
+                    <input type="password" id="token" required name="token" pattern="^\s*[^\s]+\s*$" title="Anything that is not just whitespace" />
                     </div>
 
                     <div className="pure-controls">
