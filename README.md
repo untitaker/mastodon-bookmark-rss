@@ -23,13 +23,13 @@ hostnames](https://docs.rs/axum/0.6.4/axum/extract/struct.Host.html). Those
 are used to enforce (currently hardcoded) per-IP rate limits, and to send the
 app's own hostname as part of the user-agent that Mastodon admins can see.
 
-# Running it locally
+## Running it locally
 
 1. Clone this repository
 2. Have Rust, Node and Yarn installed. I recommend [rustup](https://rustup.rs/)
    for Rust and [Volta](https://volta.sh/) for installing both Node and Yarn.
 3. Install [entr](http://eradman.com/entrproject/)
-4. Run `yarn dev` to get a devserver at `localhost:3000`
+4. Run `yarn install && yarn dev` to get a devserver at `localhost:3000`
 
 ## License
 
