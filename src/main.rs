@@ -24,11 +24,19 @@ async fn main() {
     // and thus we need a static reference to it
     let governor_conf = Box::new(
         GovernorConfigBuilder::default()
-            .per_second(if cfg!(debug_assertions) { 1000 } else { 2 })
-            .burst_size(if cfg!(debug_assertions) { 1000 } else { 5 })
+            .per_second(2)
+            .burst_size(5)
             .finish()
             .unwrap(),
     );
+
+    let rate_limit_layer = ServiceBuilder::new()
+        .layer(HandleErrorLayer::new(|e: BoxError| async move {
+            display_error(e)
+        }))
+        .layer(GovernorLayer {
+            config: Box::leak(governor_conf),
+        });
 
     let app = Router::new()
         .route("/", get(|| async { Html(include_str!("index.html")) }))
@@ -51,16 +59,7 @@ async fn main() {
                 )
             }),
         )
-        .route("/feed", get(show_feed))
-        .layer(
-            ServiceBuilder::new()
-                .layer(HandleErrorLayer::new(|e: BoxError| async move {
-                    display_error(e)
-                }))
-                .layer(GovernorLayer {
-                    config: Box::leak(governor_conf),
-                }),
-        );
+        .route("/feed", get(show_feed).route_layer(rate_limit_layer));
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     tracing::debug!("listening on {}", addr);
