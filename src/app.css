@@ -1,15 +1,15 @@
 @import "../node_modules/purecss/build/pure-min.css";
 
 .content {
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 0 10px;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 0 10px;
 }
 
 .green {
-    color: rgb(28, 184, 65);
+  color: rgb(28, 184, 65);
 }
 
 .red {
-    color: rgb(202, 60, 60);
+  color: rgb(202, 60, 60);
 }

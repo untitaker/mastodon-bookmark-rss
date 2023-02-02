@@ -1,24 +1,30 @@
 {
+  "type": "module",
+  "main": "index.tsx",
   "name": "mastodon-bookmark-rss",
   "version": "0.1.0",
   "description": "An app to subscribe to your Mastodon bookmarks via RSS",
-  "main": "index.tsx",
   "repository": "git@github.com:untitaker/mastodon-bookmark-rss.git",
   "author": "Markus Unterwaditzer <markus-honeypot@unterwaditzer.net>",
   "license": "MIT",
   "dependencies": {
+    "@tsconfig/svelte": "^3.0.0",
     "esbuild": "^0.17.2",
+    "esbuild-svelte": "^0.7.3",
     "purecss": "^3.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "svelte": "^3.55.1",
+    "svelte-check": "^3.0.3",
+    "svelte-preprocess": "^5.0.1"
   },
   "scripts": {
-    "build": "esbuild --bundle --minify src/app.tsx --outfile=build/bundle.js",
-    "dev": "find src/ | entr -sr 'yarn build && cargo run'"
+    "build": "node buildscript.js",
+    "typecheck": "svelte-check",
+    "dev": "find src/ | entr -sr 'yarn build && cargo run'",
+    "fmt": "prettier --write src/ && cargo fmt"
   },
   "devDependencies": {
-    "@types/react-dom": "^18.0.10",
-    "prettier": "^2.8.3"
+    "prettier": "^2.8.3",
+    "prettier-plugin-svelte": "^2.9.0"
   },
   "volta": {
     "node": "18.13.0"
