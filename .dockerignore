@@ -1,4 +1,5 @@
 /target
 /testdata
 .git
-/bundle
+/node_modules
+/build

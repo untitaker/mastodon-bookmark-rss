@@ -1,8 +1,8 @@
 FROM node:19-alpine3.16 as frontend-builder
 
 WORKDIR /app
-COPY yarn.lock package.json ./
-COPY src/* ./src/
+COPY yarn.lock package.json buildscript.js ./
+COPY src ./src/
 RUN yarn install --pure-lockfile
 RUN yarn build
 
