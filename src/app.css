@@ -1,4 +1,6 @@
-@import "../node_modules/purecss/build/pure-min.css";
+@import "../node_modules/purecss/build/base.css";
+@import "../node_modules/purecss/build/buttons.css";
+@import "../node_modules/purecss/build/forms.css";
 
 .content {
   max-width: 500px;
