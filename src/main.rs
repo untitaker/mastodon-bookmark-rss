@@ -14,6 +14,8 @@ use std::{net::SocketAddr, time::Duration};
 use tower::ServiceBuilder;
 use tower_governor::{errors::display_error, governor::GovernorConfigBuilder, GovernorLayer};
 
+const MAX_UPSTREAM_RESPONSE_SIZE: usize = 5 * 1024 * 1024; // response from mastodon must be less than 5 MB
+
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
@@ -75,6 +77,10 @@ enum Error {
     UpstreamIO(#[from] reqwest::Error),
     #[error("parsing a datetime from mastodon failed")]
     UpstreamChrono(#[from] chrono::ParseError),
+    #[error("failed to parse JSON response")]
+    Serde(#[from] serde_json::Error),
+    #[error("mastodon response too large")]
+    ResponseTooLarge,
 }
 
 impl IntoResponse for Error {
@@ -87,7 +93,7 @@ async fn show_feed(Query(params): Query<ShowFeed>, Host(host): Host) -> Result<R
     let url = format!("https://{}/api/v1/bookmarks", params.host);
 
     static HTTP_CLIENT: OnceCell<reqwest::Client> = OnceCell::new();
-    let upstream_response: Vec<UpstreamBookmark> = HTTP_CLIENT
+    let mut upstream_response = HTTP_CLIENT
         .get_or_init(reqwest::Client::new)
         .get(url)
         .header("Authorization", format!("Bearer {}", params.token))
@@ -104,12 +110,21 @@ async fn show_feed(Query(params): Query<ShowFeed>, Host(host): Host) -> Result<R
         .timeout(Duration::from_secs(5))
         .send()
         .await?
-        // Perhaps limit the response body size here? But how.
-        .error_for_status()?
-        .json()
-        .await?;
+        .error_for_status()?;
 
-    // Why can't I use a generator here? Oh god.
+    let mut upstream_response_body = Vec::new();
+
+    while let Some(chunk) = upstream_response.chunk().await? {
+        if upstream_response_body.len() + chunk.len() > MAX_UPSTREAM_RESPONSE_SIZE {
+            return Err(Error::ResponseTooLarge);
+        }
+
+        upstream_response_body.extend(chunk);
+    }
+
+    let upstream_response_body_parsed: Vec<UpstreamBookmark> =
+        serde_json::from_slice(&upstream_response_body)?;
+
     let mut body = String::new();
     body.push_str(
         r#"<?xml version="1.0" encoding="UTF-8"?>
@@ -123,7 +138,7 @@ async fn show_feed(Query(params): Query<ShowFeed>, Host(host): Host) -> Result<R
     body.push_str(&params.host);
     body.push_str("]]></link>");
 
-    for bookmark in upstream_response {
+    for bookmark in upstream_response_body_parsed {
         body.push_str("<item>");
         body.push_str("<link><![CDATA[");
         body.push_str(&bookmark.url);
