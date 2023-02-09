@@ -31,7 +31,7 @@ app's own hostname as part of the user-agent that Mastodon admins can see.
 3. Install [entr](http://eradman.com/entrproject/)
 4. Run `yarn install && yarn dev` to get a devserver at `localhost:3000`
 
-To get a standalone release binary, run `yarn build && cargo build --release`.
+To get a standalone release binary, run `yarn install && yarn build && cargo build --release`.
 
 ## License
 
