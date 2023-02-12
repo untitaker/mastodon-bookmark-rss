@@ -12,29 +12,26 @@
   <div>loading...</div>
 {:then feedUrl}
   {#if !feedUrl}
-    <form class="pure-form pure-form-aligned" on:submit={submitLoginForm}>
+    <form class="pure-form pure-form-stacked" on:submit={submitLoginForm}>
       <fieldset>
-        <div class="pure-control-group">
-          <label for="host">Your instance</label>
-          <input
-            type="text"
-            id="host"
-            required
-            name="host"
-            placeholder="e.g. mastodon.social"
-            pattern="[a-zA-Z0-9.:-]+"
-            title="Something that looks like a hostname"
-          />
-        </div>
-
-        <div class="pure-controls">
-          <input
-            type="submit"
-            class="pure-button pure-button-primary"
-            value="Get RSS feed"
-          />
-        </div>
+        <label for="host">Your instance</label>
+        <input
+          type="text"
+          id="host"
+          class="pure-input-1"
+          required
+          name="host"
+          placeholder="e.g. mastodon.social"
+          pattern="[a-zA-Z0-9.:-]+"
+          title="Something that looks like a hostname"
+        />
       </fieldset>
+
+      <input
+        type="submit"
+        class="pure-button pure-button-primary"
+        value="Get RSS feed"
+      />
     </form>
   {:else}
     <div class="green">

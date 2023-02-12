@@ -31,10 +31,8 @@
 
       <ul>
         <li>
-          This service does not store any data at all. The access token you
-          provide is just encoded in the RSS feed's URL and temporarily stored
-          in server memory every time the RSS feed is requested by your feed
-          reader.
+          This service does not store any data at all. All needed credentials
+          are encoded in the RSS feed's URL.
         </li>
 
         <li>
@@ -58,6 +56,14 @@
             (+&lt;installation_url&gt;)</code
           >. <code>installation_url</code> will point to the public URL of
           wherever this software is hosted, on a best-effort basis.
+        </li>
+
+        <li>
+          This service enforces some basic rate limits. Any
+          reasonable RSS feed reader should not run into them.
+          Please don't poll your RSS feed more often than you
+          actually need, this relieves this service and your
+          Mastodon server.
         </li>
       </ul>
     </section>
