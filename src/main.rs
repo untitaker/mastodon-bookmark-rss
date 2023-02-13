@@ -34,6 +34,7 @@ async fn main() {
 
     let rate_limit_layer = ServiceBuilder::new()
         .layer(HandleErrorLayer::new(|e: BoxError| async move {
+            tracing::error!("error while serving request: {}", e.to_string());
             display_error(e)
         }))
         .layer(GovernorLayer {
@@ -64,7 +65,7 @@ async fn main() {
         .route("/feed", get(show_feed).route_layer(rate_limit_layer));
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
-    tracing::debug!("listening on {}", addr);
+    tracing::info!("listening on {}", addr);
     axum::Server::bind(&addr)
         .serve(app.into_make_service_with_connect_info::<SocketAddr>())
         .await
@@ -73,11 +74,11 @@ async fn main() {
 
 #[derive(Debug, thiserror::Error)]
 enum Error {
-    #[error("request to your mastodon instance failed: {0}")]
+    #[error("request to mastodon instance failed: {0}")]
     UpstreamIO(#[from] reqwest::Error),
-    #[error("parsing a datetime from mastodon failed")]
+    #[error("parsing a datetime from mastodon failed: {0}")]
     UpstreamChrono(#[from] chrono::ParseError),
-    #[error("failed to parse JSON response")]
+    #[error("failed to parse JSON response: {0}")]
     Serde(#[from] serde_json::Error),
     #[error("mastodon response too large")]
     ResponseTooLarge,
@@ -85,7 +86,9 @@ enum Error {
 
 impl IntoResponse for Error {
     fn into_response(self) -> Response {
-        (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()).into_response()
+        let s = self.to_string();
+        tracing::error!("error while serving request: {}", s);
+        (StatusCode::INTERNAL_SERVER_ERROR, s).into_response()
     }
 }
 
