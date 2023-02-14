@@ -12,22 +12,49 @@ use serde::Deserialize;
 use std::{net::SocketAddr, time::Duration};
 
 use tower::ServiceBuilder;
-use tower_governor::{errors::display_error, governor::GovernorConfigBuilder, GovernorLayer};
+use tower_governor::{
+    errors::display_error, governor::GovernorConfigBuilder, key_extractor::KeyExtractor,
+    GovernorError, GovernorLayer,
+};
 
 const MAX_UPSTREAM_RESPONSE_SIZE: usize = 5 * 1024 * 1024; // response from mastodon must be less than 5 MB
+
+#[derive(Clone)]
+struct ShowFeedExtractor;
+
+impl KeyExtractor for ShowFeedExtractor {
+    type Key = ShowFeed;
+
+    fn extract<B>(
+        &self,
+        req: &axum::http::Request<B>,
+    ) -> Result<ShowFeed, tower_governor::GovernorError> {
+        let query = req.uri().query().unwrap_or_default();
+        serde_urlencoded::from_str(query).map_err(|_| GovernorError::UnableToExtractKey)
+    }
+}
 
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
 
     // Allow bursts with up to five requests per IP address
-    // and replenishes one element every two seconds
-    // We Box it because Axum 0.6 requires all Layers to be Clone
-    // and thus we need a static reference to it
-    let governor_conf = Box::new(
+    // and replenishes one element every two seconds>
+    let per_ip_governor_conf = Box::new(
         GovernorConfigBuilder::default()
             .per_second(2)
             .burst_size(5)
+            .finish()
+            .unwrap(),
+    );
+
+    // Allow bursts with up to one request per feed
+    // and replenishes one element every minute.
+    let per_feed_governor_conf = Box::new(
+        GovernorConfigBuilder::default()
+            .key_extractor(ShowFeedExtractor)
+            .per_second(60)
+            .burst_size(1)
             .finish()
             .unwrap(),
     );
@@ -37,8 +64,13 @@ async fn main() {
             tracing::error!("error while serving request: {}", e.to_string());
             display_error(e)
         }))
+        // XXX: enforcing two governors one after the other is not really correct in case of
+        // partial success, see https://github.com/antifuchs/governor/issues/167
         .layer(GovernorLayer {
-            config: Box::leak(governor_conf),
+            config: Box::leak(per_ip_governor_conf),
+        })
+        .layer(GovernorLayer {
+            config: Box::leak(per_feed_governor_conf),
         });
 
     let app = Router::new()
@@ -189,7 +221,7 @@ fn escape_for_cdata(input: &str) -> String {
     input.replace("&", "&amp;").replace("]]>", "")
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Hash, Eq, PartialEq, Debug, Clone)]
 struct ShowFeed {
     host: String,
     token: String,

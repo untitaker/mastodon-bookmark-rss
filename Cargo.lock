@@ -605,6 +605,7 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
+ "serde_urlencoded",
  "thiserror",
  "tokio",
  "tower",
@@ -1258,8 +1259,7 @@ checksum = "b6bc1c9ce2b5135ac7f93c72918fc37feb872bdc6a5533a8b85eb4b86bfdae52"
 [[package]]
 name = "tower_governor"
 version = "0.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c6be418f6d18863291f0a7fa1da1de71495a19a54b5fb44969136f731a47e86"
+source = "git+https://github.com/untitaker/tower-governor?branch=key-extractor-ergonomics#9b89da9befaf969c4b9ea7ea9990ef727fa90405"
 dependencies = [
  "axum",
  "forwarded-header-value",
