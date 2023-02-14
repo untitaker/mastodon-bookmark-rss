@@ -48,13 +48,13 @@ async fn main() {
             .unwrap(),
     );
 
-    // Allow bursts with up to one request per feed
+    // Allow bursts with up to 10 requests per feed (=(host, token))
     // and replenishes one element every minute.
     let per_feed_governor_conf = Box::new(
         GovernorConfigBuilder::default()
             .key_extractor(ShowFeedExtractor)
             .per_second(60)
-            .burst_size(1)
+            .burst_size(10)
             .finish()
             .unwrap(),
     );
