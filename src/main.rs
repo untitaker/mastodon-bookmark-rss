@@ -49,11 +49,13 @@ async fn main() {
     );
 
     // Allow bursts with up to 10 requests per feed (=(host, token))
-    // and replenishes one element every minute.
+    // and replenishes one element every 10 minutes.
+    //
+    // Effectively 10 requests per 10 minutes.
     let per_feed_governor_conf = Box::new(
         GovernorConfigBuilder::default()
             .key_extractor(ShowFeedExtractor)
-            .per_second(60)
+            .per_second(600)
             .burst_size(10)
             .finish()
             .unwrap(),
@@ -66,11 +68,14 @@ async fn main() {
         }))
         // XXX: enforcing two governors one after the other is not really correct in case of
         // partial success, see https://github.com/antifuchs/governor/issues/167
-        .layer(GovernorLayer {
-            config: Box::leak(per_ip_governor_conf),
-        })
+        //
+        // Layers are sorted by how large their retry-after header is: The longer rate limits
+        // (larger `per_second` value) go first.
         .layer(GovernorLayer {
             config: Box::leak(per_feed_governor_conf),
+        })
+        .layer(GovernorLayer {
+            config: Box::leak(per_ip_governor_conf),
         });
 
     let app = Router::new()
