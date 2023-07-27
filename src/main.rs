@@ -166,7 +166,7 @@ async fn show_feed(Query(params): Query<ShowFeed>, Host(host): Host) -> Result<R
     let mut body = String::new();
     body.push_str(
         r#"<?xml version="1.0" encoding="UTF-8"?>
-        <rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+        <rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/">
         <channel>
         <title>Mastodon Bookmarks</title>
         <description></description>
@@ -201,6 +201,11 @@ async fn show_feed(Query(params): Query<ShowFeed>, Host(host): Host) -> Result<R
             body.push_str(&bookmark.url);
             body.push_str("]]></title>");
         }
+        if let Some(ref account) = bookmark.account {
+            body.push_str("<dc:creator><![CDATA[@");
+            body.push_str(&escape_for_cdata(&account.username));
+            body.push_str("]]></dc:creator>");
+        }
 
         body.push_str("<content:encoded><![CDATA[");
         body.push_str(&escape_for_cdata(&bookmark.content));
@@ -234,9 +239,16 @@ struct ShowFeed {
 struct UpstreamBookmark {
     #[serde(default)]
     card: Option<UpstreamCard>,
+    account: Option<UpstreamAccount>,
     url: String,
     created_at: String,
     content: String,
+}
+
+#[derive(Deserialize)]
+struct UpstreamAccount {
+    #[serde(default)]
+    username: String,
 }
 
 #[derive(Deserialize)]
