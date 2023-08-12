@@ -178,9 +178,6 @@ async fn show_feed(Query(params): Query<ShowFeed>, Host(host): Host) -> Result<R
 
     for bookmark in upstream_response_body_parsed {
         body.push_str("<item>");
-        body.push_str("<link><![CDATA[");
-        body.push_str(&bookmark.url);
-        body.push_str("]]></link>");
         body.push_str("<pubDate>");
         let parsed = DateTime::parse_from_rfc3339(&bookmark.created_at)?;
         body.push_str(&parsed.to_rfc2822());
@@ -189,14 +186,16 @@ async fn show_feed(Query(params): Query<ShowFeed>, Host(host): Host) -> Result<R
         body.push_str(&bookmark.url);
         body.push_str("]]></guid>");
         if let Some(ref card) = bookmark.card {
+            body.push_str("<link><![CDATA[");
+            body.push_str(&card.url);
+            body.push_str("]]></link>");
             body.push_str("<title><![CDATA[");
             body.push_str(&card.title);
             body.push_str("]]></title>");
-
-            body.push_str("<description><![CDATA[");
-            body.push_str(&escape_for_cdata(&card.description));
-            body.push_str("]]></description>");
         } else {
+            body.push_str("<link><![CDATA[");
+            body.push_str(&bookmark.url);
+            body.push_str("]]></link>");
             body.push_str("<title><![CDATA[");
             body.push_str(&bookmark.url);
             body.push_str("]]></title>");
@@ -208,6 +207,9 @@ async fn show_feed(Query(params): Query<ShowFeed>, Host(host): Host) -> Result<R
         }
 
         body.push_str("<content:encoded><![CDATA[");
+        body.push_str("<p><a href=\"");
+        body.push_str(&bookmark.url);
+        body.push_str("\">Original Mastodon Post</a></p>");
         body.push_str(&escape_for_cdata(&bookmark.content));
         body.push_str("]]></content:encoded>");
         body.push_str("</item>\n");
@@ -256,5 +258,5 @@ struct UpstreamCard {
     #[serde(default)]
     title: String,
     #[serde(default)]
-    description: String,
+    url: String,
 }
