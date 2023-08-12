@@ -2,7 +2,24 @@
 
 A small web service to let you connect your mastodon bookmarks to your RSS reader.
 
+Save interesting posts found on Mastodon into your read-it-later list by using Mastodon's bookmark function.
+
 Use the instance at [woodland.cafe](https://bookmark-rss.services.woodland.cafe) or explore the options for self-hosting below.
+
+## Linking behavior
+
+Normally the generated RSS feed links to the respective bookmarked Mastodon
+post. However, if the Mastodon post itself contains a link to another website,
+the RSS item will use the link and title from that website, or rather from
+Mastodon's link preview.
+
+The purpose of this is to allow automatic prefetching and saving of article
+content, which is a feature found in a few RSS readers such as Inoreader. In
+those cases Mastodon (and Twitter) is just being used as a glorified link
+aggregator.
+
+The original Mastodon post URL and content is still stored in the RSS
+`<content:encoded>` tag, so that additional context can be recovered.
 
 ## Operating it yourself
 
