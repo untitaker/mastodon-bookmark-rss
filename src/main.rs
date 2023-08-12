@@ -228,7 +228,7 @@ async fn show_feed(Query(params): Query<ShowFeed>, Host(host): Host) -> Result<R
 
 fn escape_for_cdata(input: &str) -> String {
     // There do not appear to be any decent standalone crates for this.
-    input.replace("&", "&amp;").replace("]]>", "")
+    input.replace('&', "&amp;").replace("]]>", "")
 }
 
 #[derive(Deserialize, Hash, Eq, PartialEq, Debug, Clone)]
