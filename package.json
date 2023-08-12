@@ -27,6 +27,7 @@
     "prettier-plugin-svelte": "^2.9.0"
   },
   "volta": {
-    "node": "18.13.0"
+    "node": "18.13.0",
+    "yarn": "1.22.19"
   }
 }
