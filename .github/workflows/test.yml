@@ -16,19 +16,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
+      - run: cargo fmt --check
+
+      - uses: volta-cli/action@v4
+
+      - run: yarn
+      - run: yarn build
+
       - uses: actions/cache@v3
         with:
           path: |
             ~/.cargo
             ./target/
           key: ${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          components: clippy
+
+      - uses: dtolnay/rust-toolchain@stable
       - run: cargo build
       - run: cargo test
-      - run: cargo fmt --check
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
