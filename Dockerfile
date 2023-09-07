@@ -1,4 +1,4 @@
-FROM node:19-alpine3.16 as frontend-builder
+FROM node:20-alpine3.18 as frontend-builder
 
 WORKDIR /app
 COPY yarn.lock package.json buildscript.js ./
@@ -6,7 +6,11 @@ COPY src ./src/
 RUN yarn install --pure-lockfile
 RUN yarn build
 
-FROM rust:1.66-alpine3.16 as builder
+FROM rust:1.72-alpine3.18 as builder
+
+RUN mkdir -p ~/.cargo && \
+    echo '[registries.crates-io]' > ~/.cargo/config && \
+    echo 'protocol = "sparse"' >> ~/.cargo/config
 
 RUN apk add --no-cache libc-dev
 
@@ -33,7 +37,7 @@ RUN rm ./target/release/deps/mastodon_bookmark_rss* && cargo build --release
 
 # Our production image starts here, which uses
 # the files from the builder image above.
-FROM alpine:3.16
+FROM alpine:3.18
 
 COPY --from=builder /app/target/release/mastodon-bookmark-rss /usr/local/bin/mastodon-bookmark-rss
 
