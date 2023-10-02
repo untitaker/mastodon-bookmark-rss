@@ -4,7 +4,7 @@ A small web service to let you connect your mastodon bookmarks to your RSS reade
 
 Save interesting posts found on Mastodon into your read-it-later list by using Mastodon's bookmark function.
 
-Use the instance at [woodland.cafe](https://bookmark-rss.services.woodland.cafe) or explore the options for self-hosting below.
+Use the instance at [woodland.cafe](https://bookmark-rss.woodland.cafe) or explore the options for self-hosting below.
 
 ## Linking behavior
 
