@@ -31,9 +31,9 @@ Please see [docs/deploy.md](docs/deploy.md).
 2. Have Rust, Node and Yarn installed. I recommend [rustup](https://rustup.rs/)
    for Rust and [Volta](https://volta.sh/) for installing both Node and Yarn.
 3. Install [entr](http://eradman.com/entrproject/)
-4. Run `yarn install && yarn dev` to get a devserver at `localhost:3000`
+4. Run `npm install && npm run dev` to get a devserver at `localhost:3000`
 
-To get a standalone release binary, run `yarn install && yarn build && cargo build --release`.
+To get a standalone release binary, run `npm install && npm run build && cargo build --release`.
 
 ## License
 

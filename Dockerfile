@@ -1,10 +1,10 @@
-FROM node:20-alpine3.18 as frontend-builder
+FROM node:21-alpine3.18 as frontend-builder
 
 WORKDIR /app
-COPY yarn.lock package.json buildscript.js ./
+COPY package-lock.json package.json buildscript.js ./
 COPY src ./src/
-RUN yarn install --pure-lockfile
-RUN yarn build
+RUN npm ci
+RUN npm run build
 
 FROM rust:1.72-alpine3.18 as builder
 

@@ -19,7 +19,7 @@
   "scripts": {
     "build": "node buildscript.js",
     "typecheck": "svelte-check",
-    "dev": "find src/ | entr -sr 'yarn build && cargo run'",
+    "dev": "find src/ | entr -sr 'npm run build && cargo run'",
     "fmt": "prettier --write src/ && cargo fmt"
   },
   "devDependencies": {
@@ -27,7 +27,7 @@
     "prettier-plugin-svelte": "^2.9.0"
   },
   "volta": {
-    "node": "18.13.0",
-    "yarn": "1.22.19"
+    "node": "21.0.0",
+    "npm": "10.2.1"
   }
 }

@@ -78,7 +78,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(|| async { Html(include_str!("index.html")) }))
-        // If this line is failing compilation, you need to run 'yarn install && yarn build' to get your CSS bundle.
+        // If this line is failing compilation, you need to run 'npm install && npm run build' to get your CSS bundle.
         .route(
             "/bundle.css",
             get(|| async {
