@@ -22,7 +22,7 @@
           required
           name="host"
           placeholder="e.g. mastodon.social"
-          pattern="[a-zA-Z0-9.:\-]+"
+          pattern="[a-zA-Z0-9.:\\-]+"
           title="Something that looks like a hostname"
         />
       </fieldset>
