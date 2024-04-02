@@ -21,6 +21,14 @@ aggregator.
 The original Mastodon post URL and content is still stored in the RSS
 `<content:encoded>` tag, so that additional context can be recovered.
 
+## Feed limits
+
+This tool is limited by design to fetch 20 bookmarks. It is mainly intended 
+to automate adding new bookmarks to a reading list, not to provide a complete 
+historical archive within an RSS reader. More could be added, but since there 
+is no state management or caching in place, it could become inconsiderate towards 
+the target Mastodon server to pull many items on every fetch of the feed.
+
 ## Operating it yourself
 
 Please see [docs/deploy.md](docs/deploy.md).
