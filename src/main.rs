@@ -209,7 +209,35 @@ async fn show_feed(Query(params): Query<ShowFeed>, Host(host): Host) -> Result<R
         body.push_str("<content:encoded><![CDATA[");
         body.push_str("<p><a href=\"");
         body.push_str(&bookmark.url);
-        body.push_str("\">Original Mastodon Post</a></p>");
+        body.push_str("\">Original Mastodon Post</a>");
+
+        let client = &params.client;
+        if !client.is_empty() {
+            body.push_str(" - Open in <a href=\"");
+            match client.as_str() {
+                "elk" => {
+                    body.push_str("https://elk.zone/");
+                    body.push_str(&bookmark.url);
+                    body.push_str("\">Elk</a>");
+                },
+                "phanpy" => {
+                    body.push_str("https://phanpy.social/#/");
+                    body.push_str(&bookmark.url);
+                    body.push_str("\">Phanpy</a>");
+                },
+                "ivory" => {
+                    body.push_str("ivory://acct/openURL?url=");
+                    body.push_str(&bookmark.url);
+                    body.push_str("\">Ivory</a>");
+                }
+                _ => {
+                    body.push_str(&bookmark.url);
+                    body.push_str("\">Unknown client :(</a>");
+                }
+            }
+        }
+
+        body.push_str("</p>");
         body.push_str(&escape_for_cdata(&bookmark.content));
         body.push_str("]]></content:encoded>");
         body.push_str("</item>\n");
@@ -235,6 +263,8 @@ fn escape_for_cdata(input: &str) -> String {
 struct ShowFeed {
     host: String,
     token: String,
+    #[serde(default)]
+    client: String,
 }
 
 #[derive(Deserialize)]
