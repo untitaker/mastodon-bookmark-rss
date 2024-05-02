@@ -213,26 +213,26 @@ async fn show_feed(Query(params): Query<ShowFeed>, Host(host): Host) -> Result<R
 
         let client = &params.client;
         if !client.is_empty() {
-            body.push_str(" - Open in <a href=\"");
+            body.push_str(" - <a href=\"");
             match client.as_str() {
                 "elk" => {
                     body.push_str("https://elk.zone/");
                     body.push_str(&bookmark.url);
-                    body.push_str("\">Elk</a>");
+                    body.push_str("\">Open in Elk</a>");
                 },
                 "phanpy" => {
                     body.push_str("https://phanpy.social/#/");
                     body.push_str(&bookmark.url);
-                    body.push_str("\">Phanpy</a>");
+                    body.push_str("\">Open in Phanpy</a>");
                 },
                 "ivory" => {
                     body.push_str("ivory://acct/openURL?url=");
                     body.push_str(&bookmark.url);
-                    body.push_str("\">Ivory</a>");
+                    body.push_str("\">Open in Ivory</a>");
                 }
                 _ => {
                     body.push_str(&bookmark.url);
-                    body.push_str("\">Unknown client :(</a>");
+                    body.push_str("\">Open original post - unknown client :(</a>");
                 }
             }
         }
