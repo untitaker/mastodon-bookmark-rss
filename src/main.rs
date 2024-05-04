@@ -221,32 +221,32 @@ async fn show_feed(Query(params): Query<ShowFeed>, Host(host): Host) -> Result<R
                     body.push_str("/authorize_interaction?uri=");
                     body.push_str(&bookmark.url);
                     body.push_str("\">Open in your Mastodon host</a>");
-                },
+                }
                 "elk" => {
                     body.push_str("https://elk.zone/");
                     body.push_str(&bookmark.url);
                     body.push_str("\">Open in Elk</a>");
-                },
+                }
                 "elkcanary" => {
                     body.push_str("https://main.elk.zone/");
                     body.push_str(&bookmark.url);
                     body.push_str("\">Open in Elk</a>");
-                },
+                }
                 "phanpy" => {
                     body.push_str("https://phanpy.social/#/");
                     body.push_str(&bookmark.url);
                     body.push_str("\">Open in Phanpy</a>");
-                },
+                }
                 "phanpydev" => {
                     body.push_str("https://dev.phanpy.social/#/");
                     body.push_str(&bookmark.url);
                     body.push_str("\">Open in Phanpy</a>");
-                },
+                }
                 "trunks" => {
                     body.push_str("https://trunks.social/resolve?url=");
                     body.push_str(&bookmark.url);
                     body.push_str("\">Open in Trunks</a>");
-                },
+                }
                 "ivory" => {
                     body.push_str("ivory://acct/openURL?url=");
                     body.push_str(&bookmark.url);
