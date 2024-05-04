@@ -2,9 +2,18 @@
   export let launchLogin;
   export let feedUrlPromise;
 
+  let baseFeedUrl;
+
   function submitLoginForm(e) {
     launchLogin(e.target.host.value);
     e.preventDefault();
+  }
+
+  function changeClient(e) {
+    const client = e.target.value;
+    const result = document.querySelector('input');
+    if(!baseFeedUrl) baseFeedUrl = result.value;
+    result.value = `${client === 'none' ? baseFeedUrl : `${baseFeedUrl}&client=${client}`}`;
   }
 </script>
 
@@ -34,12 +43,23 @@
       />
     </form>
   {:else}
-    <div class="green">
-      Subscribe to the following URL in your feed reader. Anybody who knows this
-      URL can read your bookmarks!
-      <form class="pure-form">
+    <div>
+      <p class="green">Subscribe to the following URL in your feed reader. Anybody who knows this
+      URL can read your bookmarks!</p>
+      <form class="pure-form pure-form-stacked">
         <fieldset>
           <input type="text" class="pure-input-1" readOnly value={feedUrl} />
+          <label for="form-client-link">Optional: Add an "Open In" link to bookmarks</label>
+          <select on:change={changeClient}>
+            <option value="none" selected>None</option>
+            <option value="host">Your Mastodon Host</option>
+            <option value="elk">Elk</option>
+            <option value="elkcanary">Elk Canary</option>
+            <option value="phanpy">Phanpy</option>
+            <option value="phanpydev">Phanpy Dev</option>
+            <option value="trunks">Trunks</option>
+            <option value="ivory">Ivory</option>
+          </select>
         </fieldset>
       </form>
     </div>
