@@ -1,13 +1,11 @@
 // this will cause esbuild to also create src/bundle.css
 import "./app.css";
 
-import App from "./svelte/App.svelte";
-
 const OAUTH_CLIENT_NAME = "Mastodon Bookmark RSS";
 const OAUTH_SCOPES = "read:bookmarks";
 const SERVICE_BASE_URL = `${window.location.origin}${window.location.pathname}`;
 
-const launchLogin = async (baseUrl: string) => {
+const launchLogin = async (baseUrl) => {
   window.localStorage.setItem("baseUrl", baseUrl);
 
   const params = new FormData();
@@ -75,10 +73,73 @@ const getFeedUrl = async () => {
   return `${SERVICE_BASE_URL}feed?host=${baseUrl}&token=${accessToken}`;
 };
 
-new App({
-  target: document.getElementById("app-root"),
-  props: {
-    launchLogin,
-    feedUrlPromise: getFeedUrl(),
-  },
-});
+(async () => {
+  const appRoot = document.getElementById("app-root");
+  appRoot.innerText = "loading...";
+  const feedUrl = await getFeedUrl();
+  if (!feedUrl) {
+    appRoot.innerHTML = `
+    <form class="pure-form pure-form-stacked" onsubmit="submitLoginForm()">
+      <fieldset>
+        <label for="host">Your instance</label>
+        <input
+          type="text"
+          id="host"
+          class="pure-input-1"
+          required
+          name="host"
+          placeholder="e.g. mastodon.social"
+          title="Something that looks like a hostname"
+        />
+      </fieldset>
+
+      <input
+        type="submit"
+        class="pure-button pure-button-primary"
+        value="Get RSS feed"
+      />
+    </form>
+    `;
+
+    document.querySelector("form").onsubmit = (e) => {
+      launchLogin(e.target.host.value);
+      e.preventDefault();
+    };
+  } else {
+    appRoot.innerHTML = `
+    <div>
+      <p class="green">Subscribe to the following URL in your feed reader. Anybody who knows this
+      URL can read your bookmarks!</p>
+      <form class="pure-form pure-form-stacked">
+        <fieldset>
+          <input type="text" class="pure-input-1" readOnly />
+          <label for="form-client-link">Optional: Add an "Open In" link to bookmarks</label>
+          <select onchange="changeClient()">
+            <option value="none" selected>None</option>
+            <option value="host">Your Mastodon Host</option>
+            <option value="elk">Elk</option>
+            <option value="elkcanary">Elk Canary</option>
+            <option value="phanpy">Phanpy</option>
+            <option value="phanpydev">Phanpy Dev</option>
+            <option value="trunks">Trunks</option>
+            <option value="ivory">Ivory</option>
+          </select>
+        </fieldset>
+      </form>
+    </div>
+    `;
+
+    const changeClient = (client) => {
+      const result = document.querySelector("input");
+      result.value = `${
+        client === "none" ? feedUrl : `${feedUrl}&client=${client}`
+      }`;
+    };
+
+    document.querySelector("select").onchange = (e) => {
+      changeClient(e.target.value);
+    };
+
+    changeClient("none");
+  }
+})();
