@@ -1,20 +1,19 @@
 use axum::{
-    error_handling::HandleErrorLayer,
+    body::Body,
     extract::{Host, Query},
     http::StatusCode,
     response::{Html, IntoResponse, Response},
     routing::get,
-    BoxError, Router,
+    Router,
 };
 use chrono::DateTime;
 use once_cell::sync::OnceCell;
 use serde::Deserialize;
-use std::{net::SocketAddr, time::Duration};
+use std::{net::SocketAddr, sync::Arc, time::Duration};
 
 use tower::ServiceBuilder;
 use tower_governor::{
-    errors::display_error, governor::GovernorConfigBuilder, key_extractor::KeyExtractor,
-    GovernorError, GovernorLayer,
+    governor::GovernorConfigBuilder, key_extractor::KeyExtractor, GovernorError, GovernorLayer,
 };
 
 const MAX_UPSTREAM_RESPONSE_SIZE: usize = 5 * 1024 * 1024; // response from mastodon must be less than 5 MB
@@ -38,42 +37,55 @@ impl KeyExtractor for ShowFeedExtractor {
 async fn main() {
     tracing_subscriber::fmt::init();
 
+    let rate_limit_handler = |mut e| match e {
+        GovernorError::TooManyRequests {
+            wait_time,
+            headers: _,
+        } => Response::builder()
+            .status(StatusCode::TOO_MANY_REQUESTS)
+            .header("retry-after", wait_time)
+            .body(Body::from(format!(
+                "Too Many Requests! Wait for {}s",
+                wait_time
+            )))
+            .unwrap(),
+        _ => e.as_response(),
+    };
+
     // Allow bursts with up to five requests per IP address
     // and replenishes one element every two seconds>
-    let per_ip_governor_conf = Box::new(
+    let per_ip_governor_conf = Arc::new(
         GovernorConfigBuilder::default()
             .per_second(2)
             .burst_size(5)
+            .error_handler(rate_limit_handler)
             .finish()
             .unwrap(),
     );
 
     // Allow bursts with up to 10 requests per feed (=(host, token))
     // and replenishes one element every 10 minutes.
-    let per_feed_governor_conf = Box::new(
+    let per_feed_governor_conf = Arc::new(
         GovernorConfigBuilder::default()
             .key_extractor(ShowFeedExtractor)
             .per_second(600)
             .burst_size(10)
+            .error_handler(rate_limit_handler)
             .finish()
             .unwrap(),
     );
 
     let rate_limit_layer = ServiceBuilder::new()
-        .layer(HandleErrorLayer::new(|e: BoxError| async move {
-            tracing::error!("error while serving request: {}", e.to_string());
-            display_error(e)
-        }))
         // XXX: enforcing two governors one after the other is not really correct in case of
         // partial success, see https://github.com/antifuchs/governor/issues/167
         //
         // Layers are sorted by how large their retry-after header is: The longer rate limits
         // (larger `per_second` value) go first.
         .layer(GovernorLayer {
-            config: Box::leak(per_feed_governor_conf),
+            config: per_feed_governor_conf.clone(),
         })
         .layer(GovernorLayer {
-            config: Box::leak(per_ip_governor_conf),
+            config: per_ip_governor_conf.clone(),
         });
 
     let app = Router::new()
@@ -99,12 +111,15 @@ async fn main() {
         )
         .route("/feed", get(show_feed).route_layer(rate_limit_layer));
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
+    let addr = "0.0.0.0:3000";
     tracing::info!("listening on {}", addr);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service_with_connect_info::<SocketAddr>())
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .await
+    .unwrap();
 }
 
 #[derive(Debug, thiserror::Error)]
