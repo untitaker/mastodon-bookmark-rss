@@ -37,28 +37,12 @@ impl KeyExtractor for ShowFeedExtractor {
 async fn main() {
     tracing_subscriber::fmt::init();
 
-    let rate_limit_handler = |mut e| match e {
-        GovernorError::TooManyRequests {
-            wait_time,
-            headers: _,
-        } => Response::builder()
-            .status(StatusCode::TOO_MANY_REQUESTS)
-            .header("retry-after", wait_time)
-            .body(Body::from(format!(
-                "Too Many Requests! Wait for {}s",
-                wait_time
-            )))
-            .unwrap(),
-        _ => e.as_response(),
-    };
-
     // Allow bursts with up to five requests per IP address
     // and replenishes one element every two seconds>
     let per_ip_governor_conf = Arc::new(
         GovernorConfigBuilder::default()
             .per_second(2)
             .burst_size(5)
-            .error_handler(rate_limit_handler)
             .finish()
             .unwrap(),
     );
@@ -70,7 +54,6 @@ async fn main() {
             .key_extractor(ShowFeedExtractor)
             .per_second(600)
             .burst_size(10)
-            .error_handler(rate_limit_handler)
             .finish()
             .unwrap(),
     );
