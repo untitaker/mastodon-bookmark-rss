@@ -38,7 +38,7 @@ async fn main() {
     tracing_subscriber::fmt::init();
 
     // Allow bursts with up to five requests per IP address
-    // and replenishes one element every two seconds>
+    // and replenishes one element every two seconds.
     let per_ip_governor_conf = Arc::new(
         GovernorConfigBuilder::default()
             .per_second(2)
@@ -48,11 +48,11 @@ async fn main() {
     );
 
     // Allow bursts with up to 10 requests per feed (=(host, token))
-    // and replenishes one element every 10 minutes.
+    // and replenishes one element every hour.
     let per_feed_governor_conf = Arc::new(
         GovernorConfigBuilder::default()
             .key_extractor(ShowFeedExtractor)
-            .per_second(600)
+            .per_second(30 * 60)
             .burst_size(10)
             .finish()
             .unwrap(),
