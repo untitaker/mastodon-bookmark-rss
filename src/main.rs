@@ -1,5 +1,4 @@
 use axum::{
-    body::Body,
     extract::{Host, Query},
     http::StatusCode,
     response::{Html, IntoResponse, Response},
@@ -188,14 +187,14 @@ async fn show_feed(Query(params): Query<ShowFeed>, Host(host): Host) -> Result<R
             body.push_str(&card.url);
             body.push_str("]]></link>");
             body.push_str("<title><![CDATA[");
-            body.push_str(&card.title);
+            body.push_str(&escape_for_cdata(&card.title));
             body.push_str("]]></title>");
         } else {
             body.push_str("<link><![CDATA[");
             body.push_str(&bookmark.url);
             body.push_str("]]></link>");
             body.push_str("<title><![CDATA[");
-            body.push_str(&bookmark.url);
+            body.push_str(&escape_for_cdata(&insecure_strip_html(&bookmark.content)));
             body.push_str("]]></title>");
         }
         if let Some(ref account) = bookmark.account {
@@ -309,4 +308,21 @@ struct UpstreamCard {
     title: String,
     #[serde(default)]
     url: String,
+}
+
+fn insecure_strip_html(content: impl Into<String>) -> String {
+    let mut content = content.into();
+    let mut in_html_tag = false;
+    content.retain(|c| match (c, in_html_tag) {
+        ('<', false) => {
+            in_html_tag = true;
+            false
+        }
+        ('>', true) => {
+            in_html_tag = false;
+            false
+        }
+        _ => !in_html_tag,
+    });
+    content
 }
